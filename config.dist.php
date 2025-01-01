@@ -53,6 +53,10 @@ define('USE_IPV4', true);
 // If set to true, the script will check for your public IPv6 address too and add it as an AAAA-Record / change an existing AAAA-Record for the host.
 // Activate this only if you have IPv6 connectivity, or you *WILL* get errors.
 define('USE_IPV6', false);
+// The following two defines can be used to fetch the IPv6 address directly from the local interface via shell_cmd "ip"
+// no need to externally fetch the address via CURL when using GUA IPv6 (Global-Unicast-Address)
+//define('USE_IPV6_INTERFACE_NAME', 'ens18'); // IF not defined => Disabled and using default CURL, IF it returns no valid value => automatic fallback to CURL
+//define('USE_IPV6_INTERFACE_MGMT', false); // IF TRUE => using mngtmpaddr, ELSE => using temporary
 
 
 // If set to true, this will change TTL to 300 seconds on every run if necessary.

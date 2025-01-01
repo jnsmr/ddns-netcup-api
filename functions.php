@@ -344,6 +344,26 @@ function getCurrentPublicIPv6()
         return $providedIPv6;
     }
 
+    // If a network interface is specified, retrieve the IPv6 address from it directly, e.g. when using GUA IPv6
+    if (defined('USE_IPV6_INTERFACE_NAME')) {
+        $print_address_type = (USE_IPV6_INTERFACE_MGMT === true) ? 'management' : 'temporary';
+        outputStdout(sprintf('Fetching %s IPv6 address from network interface "%s".', $print_address_type, USE_IPV6_INTERFACE_NAME));
+
+        // Execute shell command to get the mngtmpaddr IPv6 address
+        $command_address_type = (USE_IPV6_INTERFACE_MGMT === true) ? 'mngtmpaddr' : 'temporary';
+        $command = sprintf("ip -6 addr show dev %s | grep %s | awk '{print \$2}' | cut -d/ -f1", escapeshellarg(USE_IPV6_INTERFACE_NAME), $command_address_type);
+
+        $localIPv6 = trim(shell_exec($command));
+
+        if (!empty($localIPv6) && isIPV6Valid($localIPv6)) {
+            outputStdout(sprintf('Using %s IPv6 address "%s" from interface "%s".', $print_address_type, $localIPv6, USE_IPV6_INTERFACE_NAME));
+            return $localIPv6;
+        } else {
+            outputWarning(sprintf('No valid %s IPv6 address found for interface "%s". Falling back to external service.', $print_address_type, USE_IPV6_INTERFACE_NAME));
+        }
+    }
+
+    // Fallback to fetching IPv6 address from an external service
     outputStdout('Getting IPv6 address from ' . IPV6_ADDRESS_URL . '.');
 
     $url = IPV6_ADDRESS_URL;
